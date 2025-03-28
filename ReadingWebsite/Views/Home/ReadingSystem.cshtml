@@ -1,15 +1,26 @@
 ﻿@{
     ViewData["Title"] = "文件選單";
-    var userName = Context.Request.Cookies["userName"]; 
 }
 
-<h2>@userName 歡迎登入，請選擇文件</h2>
+<div class="d-flex justify-content-between align-items-center">
+    <h2 id="userInfoArea" class="me-2"></h2>
+    <a id="logoutBtn" class="btn btn-outline-danger btn-sm d-none" href="#">登出</a>
+</div>
 <br />
 <div id="articleBtn"></div>
+
+
+
 
 @section Scripts{
     <script>
         var baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
+        
+        const token = localStorage.getItem("jwt_token");
+        if (!token) {
+            alert("請先登入！");
+            window.location.href = "/Home/Index";
+        }
  
         $(function() {
             $.ajax({
@@ -18,12 +29,37 @@
             }).done(data=>{
             //console.log(data);
             data.forEach(function(item){
-                var btn = `<button  class="btn btn-primary" onclick="location.href='/Home/Read?id=${item.fDocumentId}'">${item.fTitle}</button><br/>`;
-                $("#articleBtn").append(btn + "<br/>");
+                var btn = `<button  class="btn btn-primary mb-2" onclick="location.href='/Home/Read?id=${item.fDocumentId}'">${item.fTitle}</button><br/>`;
+                $("#articleBtn").append(btn);
             });
             }).fail(err=>{
             $("#articleBtn").html("<p>載入文件標題失敗。</p>");
             })
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("jwt_token");
+            const userName = localStorage.getItem("userName");
+
+            if (token && userName) {
+                const userInfoArea = document.getElementById("userInfoArea");
+                const logoutBtn = document.getElementById("logoutBtn");
+
+                if (userInfoArea) {
+                    userInfoArea.textContent = `歡迎，${userName}，請選擇文件`;
+                }
+
+                if (logoutBtn) {
+                    logoutBtn.classList.remove("d-none");
+                    logoutBtn.addEventListener("click", function (e) {
+                        e.preventDefault();
+                        localStorage.removeItem("jwt_token");
+                        localStorage.removeItem("userName");
+                        localStorage.removeItem("userId");
+                        window.location.href = "/Home/Index";
+                    });
+                }
+            }
         });
     </script>
 }

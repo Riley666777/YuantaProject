@@ -16,6 +16,8 @@
             <button class="btn btn-primary" type="submit">登入</button>
             <button class="btn btn-secondary" onclick="demo1()">DEMO1</button>
             <button class="btn btn-secondary" onclick="demo2()">DEMO2</button>
+            <button class="btn btn-secondary" onclick="demo3()">DEMO3</button>
+
         </form>
         <br />
         <P id="loginError" class="text-danger"></P>
@@ -24,27 +26,35 @@
 
 @section Scripts {
     <script>
+        const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
+
         $("#loginForm").submit(function(e){
             e.preventDefault();
+
+            const account = $("#account").val();
+            const password = $("#password").val();
 
             const formData = $(this).serialize();
             //console.log(formData);
             $.ajax({
-                url: '/Home/Login',
+                url: `${baseAddress}api/Auth/login`,
                 type: 'POST',
-                data: formData,
-                success: function(data){
-                    if(data.success){
-                        //console.log(data.message);
-                        window.location.href = "/Home/ReadingSystem";
-                    }else{
-                        $("#loginError").text(data.message);
-                    }
-                },
-                error: function(){
-                    $("#loginError").text("登入有錯誤");
+                contentType:'application/json',
+                data: JSON.stringify({account:account, password:password})
+            }).done(data=>{
+                console.log(data);
+                if(data.success){
+                    localStorage.setItem("jwt_token", data.token);
+                    localStorage.setItem("userName", data.userName);
+                    localStorage.setItem("userId", data.userId);
+                    window.location.href = "/Home/ReadingSystem";
+                }else{
+                    $("#loginError").text(data.message);
                 }
-            });
+            }).fail(err=>{
+                console.log(err);
+                $("#loginError").text("登入失敗");
+            })
         });
 
         function demo1(){
@@ -54,6 +64,10 @@
         function demo2(){
         $("#account").val("account02");
         $("#password").val("password02");
+        }
+        function demo3(){
+        $("#account").val("account03");
+        $("#password").val("password03");
         }
 
         @if (TempData["NotLoginMessage"] != null)

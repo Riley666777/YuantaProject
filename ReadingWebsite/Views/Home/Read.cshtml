@@ -1,6 +1,5 @@
 ﻿@{
     ViewData["Title"] = "閱讀文件";
-    var documentId = ViewBag.fDocumentId;
 }
 
 <h2 id="articleTitle">文件載入中</h2>
@@ -15,7 +14,7 @@
 @section Scripts{
     <script>
         const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
-        let currentId = @documentId;
+        let currentId =@ViewBag.fDocumentId;
         let articleList=[];
         let readingLogId=null;
 
@@ -52,7 +51,6 @@
             return $.ajax({
             url:`${baseAddress}api/TArticles/GetTitles`,
             method:'GET',
-            xhrFields: { withCredentials: true}
             });
         }
 
@@ -62,9 +60,8 @@
             //console.log("loadArticle working!");
             $.ajax({
                 url:`${baseAddress}api/TArticles/GetArticle/${id}`,
-                method:'GET',
-                xhrFields: { withCredentials: true}
-                }).done(data=>{
+                method:'GET',                
+            }).done(data=>{
                 //console.log(data);
                 $("#articleTitle").text(data.fTitle);
                 $("#articleContent").text(data.fContent);
@@ -95,10 +92,11 @@
                 }else{
                     $("#nextBtn").prop("disabled",true).text("此為最後一篇").off();
                 }
-                }).fail(err=>{
+            }).fail(err=>{
                 console.log(err);
                 $("#articleTitle").text("載入文件失敗");
-                });
+            });
+           
         }
 
         function startReading(id){
@@ -107,8 +105,8 @@
                 method:'POST',
                 contentType:'application/json',
                 data:JSON.stringify({fDocumentId:id}),
-                xhrFields: {
-                    withCredentials: true
+                headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')
                 }
                 }).done(data=>{
                     console.log(data);
@@ -123,9 +121,8 @@
             };
             return $.ajax({
                 url:`${baseAddress}api/TArticles/end/${readingLogId}`,
-                method:'PUT',
-                xhrFields: { withCredentials: true}
-        });
+                method:'PUT'
+            });
         }
         
     </script>

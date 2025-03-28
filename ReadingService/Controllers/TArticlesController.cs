@@ -10,19 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ReadingService.DTO;
 using ReadingService.Models;
+using ReadingService.Services;
 
 namespace ReadingService.Controllers
 {
-    [EnableCors("ReadingWebsite")]
     [Route("api/[controller]")]  
     [ApiController]
     public class TArticlesController : ControllerBase
     {
         private readonly dbYuantaProjectContext _context;
+        private readonly TimeService _timeService;
 
-        public TArticlesController(dbYuantaProjectContext context)
+        public TArticlesController(dbYuantaProjectContext context, TimeService timeService)
         {
             _context = context;
+            _timeService = timeService;
         }
 
         // GET: api/TArticles
@@ -59,18 +61,18 @@ namespace ReadingService.Controllers
         {
             try
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                //Console.WriteLine("userId: " + userId);
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
-                    return Unauthorized();
+                    return Unauthorized("無效的使用者資訊");
                 }
 
                 var log = new TLog
                 {
                     FUserId = userId,
                     FDocumentId = dto.FDocumentId,
-                    FStartTime = DateTime.Now,
+                    FStartTime = _timeService.GetTaiwanNow(),
                     FClientIp = HttpContext.Connection.RemoteIpAddress.ToString()
                 };
 
@@ -78,9 +80,9 @@ namespace ReadingService.Controllers
                 await _context.SaveChangesAsync();
                 return Ok(new { readingLogId = log.FLogId });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return BadRequest(e.Message);
+                return BadRequest(new { error = "寫入閱讀紀錄失敗", message = ex.Message });
 
             }
         }
@@ -93,7 +95,7 @@ namespace ReadingService.Controllers
             {
                 return NotFound();
             }
-            log.FEndTime = DateTime.Now;
+            log.FEndTime = _timeService.GetTaiwanNow();
             await _context.SaveChangesAsync();
             return Ok();
         }

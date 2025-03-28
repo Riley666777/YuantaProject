@@ -29,13 +29,6 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ReadingLogs">閱讀紀錄</a>
                         </li>
                     </ul>
-                    @if (Context.Request.Cookies["jwt_token"] != null)
-                    {
-                        <span class="navbar-text me-3">
-                            歡迎，@Context.Request.Cookies["userName"]
-                        </span>
-                        <a class="nav-link text-dark"  asp-controller="Home" asp-action="Logout">登出</a>
-                    }
                 </div>
             </div>
         </nav>

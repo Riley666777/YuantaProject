@@ -32,7 +32,12 @@
 @section Scripts
 {
     <script>
-            const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
+        const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
+        const token = localStorage.getItem("jwt_token");
+        if (!token) {
+            alert("請先登入！");
+            window.location.href = "/Home/Index";
+        }
 
         $(function(){
             //console.log("ready");

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using NuGet.Common;
+using ReadingService.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,7 +57,10 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();   
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<TimeService>();
+
 
 var app = builder.Build();
 
