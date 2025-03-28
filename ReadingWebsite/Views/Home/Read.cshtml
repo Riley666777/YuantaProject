@@ -1,0 +1,132 @@
+﻿@{
+    ViewData["Title"] = "閱讀文件";
+    var documentId = ViewBag.fDocumentId;
+}
+
+<h2 id="articleTitle">文件載入中</h2>
+<br />
+<p id="articleContent"></p>
+
+<div class="mt-4">
+    <button id="prevBtn" class="btn btn-info">上一篇</button>
+    <button id="nextBtn" class="btn btn-info">下一篇</button>
+</div>
+
+@section Scripts{
+    <script>
+        const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
+        let currentId = @documentId;
+        let articleList=[];
+        let readingLogId=null;
+
+        $(function(){
+            getArticleList().then(function(data){                
+                //console.log(data);
+                articleList = data;
+                //console.log('currrentId:'+currentId);
+                loadArticle(currentId);           
+            });
+            window.addEventListener("beforeunload",function(){
+                endReading();
+            })
+            //點prev
+            $("#prevBtn").click(function(){
+                const currentIndex = articleList.findIndex(item=>item.fDocumentId==currentId);
+                if(currentIndex>0){
+                    loadArticle(articleList[currentIndex-1].fDocumentId);
+                }
+            });
+
+            //點next
+            $("#nextBtn").click(function(){
+                const currentIndex = articleList.findIndex(item=>item.fDocumentId==currentId);
+                if(currentIndex<articleList.length-1){
+                    loadArticle(articleList[currentIndex+1].fDocumentId);
+                }
+            });
+        });
+
+        //取得所有文章&ID
+        function getArticleList(){
+            //console.log("getArticleList working!");
+            return $.ajax({
+            url:`${baseAddress}api/TArticles/GetTitles`,
+            method:'GET',
+            xhrFields: { withCredentials: true}
+            });
+        }
+
+        //取得指定文章
+        function loadArticle(id){
+            endReading(); //先結束前一篇
+            //console.log("loadArticle working!");
+            $.ajax({
+                url:`${baseAddress}api/TArticles/GetArticle/${id}`,
+                method:'GET',
+                xhrFields: { withCredentials: true}
+                }).done(data=>{
+                //console.log(data);
+                $("#articleTitle").text(data.fTitle);
+                $("#articleContent").text(data.fContent);
+                document.title = data.fTitle;
+                currentId = id;
+                //console.log('updateId:'+currentId);
+
+                startReading(id); //開始紀錄這篇
+
+                //尋找現在文件的索引位置
+                const currentIndex = articleList.findIndex(item=>item.fDocumentId==currentId);
+                const prev = articleList[currentIndex-1];
+                const next = articleList[currentIndex+1];
+                //console.log(currentIndex);
+
+                //更新按鈕
+                if(prev){
+                    $("#prevBtn").prop("disabled",false).text("上一篇："+prev.fTitle).off().click(()=>{
+                        loadArticle(prev.fDocumentId);
+                    });
+                }else{
+                    $("#prevBtn").prop("disabled",true).text("此為第一篇").off();
+                }
+                if(next){
+                    $("#nextBtn").prop("disabled",false).text("下一篇："+next.fTitle).off().click(()=>{
+                        loadArticle(next.fDocumentId);
+                    });
+                }else{
+                    $("#nextBtn").prop("disabled",true).text("此為最後一篇").off();
+                }
+                }).fail(err=>{
+                console.log(err);
+                $("#articleTitle").text("載入文件失敗");
+                });
+        }
+
+        function startReading(id){
+            return $.ajax({
+                url:`${baseAddress}api/TArticles/start`,
+                method:'POST',
+                contentType:'application/json',
+                data:JSON.stringify({fDocumentId:id}),
+                xhrFields: {
+                    withCredentials: true
+                }
+                }).done(data=>{
+                    console.log(data);
+                    readingLogId = data.readingLogId;
+                    console.log('readingLogId:'+readingLogId);
+            });
+        }
+
+        function endReading(){
+            if(!readingLogId){
+                return;
+            };
+            return $.ajax({
+                url:`${baseAddress}api/TArticles/end/${readingLogId}`,
+                method:'PUT',
+                xhrFields: { withCredentials: true}
+        });
+        }
+        
+    </script>
+}

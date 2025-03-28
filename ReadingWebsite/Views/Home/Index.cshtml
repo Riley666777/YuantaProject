@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "首頁";
+}
+
+<div class="container justify-content-center align-items-center">
+    <div class="text-center">
+        <h1 class="display-4">請登入</h1>
+        <br />
+        <form id="loginForm" method="post">
+            <label>帳號：</label>
+            <input type="text" id="account" name="account" required />
+            <br />
+            <label>密碼：</label>
+            <input type="password" id="password" name="password" required />
+            <br /> <br />
+            <button class="btn btn-primary" type="submit">登入</button>
+            <button class="btn btn-secondary" onclick="demo1()">DEMO1</button>
+            <button class="btn btn-secondary" onclick="demo2()">DEMO2</button>
+        </form>
+        <br />
+        <P id="loginError" class="text-danger"></P>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $("#loginForm").submit(function(e){
+            e.preventDefault();
+
+            const formData = $(this).serialize();
+            //console.log(formData);
+            $.ajax({
+                url: '/Home/Login',
+                type: 'POST',
+                data: formData,
+                success: function(data){
+                    if(data.success){
+                        //console.log(data.message);
+                        window.location.href = "/Home/ReadingSystem";
+                    }else{
+                        $("#loginError").text(data.message);
+                    }
+                },
+                error: function(){
+                    $("#loginError").text("登入有錯誤");
+                }
+            });
+        });
+
+        function demo1(){
+            $("#account").val("account01");
+            $("#password").val("password01");
+        }
+        function demo2(){
+        $("#account").val("account02");
+        $("#password").val("password02");
+        }
+
+        @if (TempData["NotLoginMessage"] != null)
+        {
+            <text>
+                alert('@Html.Raw(TempData["NotLoginMessage"])');
+            </text>
+        }
+    </script>
+}
+
+

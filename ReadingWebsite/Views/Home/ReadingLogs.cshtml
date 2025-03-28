@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "閱讀紀錄";
+}
+
+<h2>閱讀紀錄</h2>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="searchInput" placeholder="請輸入會員暱稱或文章標題進行搜尋">
+    </div>
+</div>
+
+<table class="table table-bordered text-center">
+    <thead>
+        <tr>
+            <th>閱讀紀錄編號</th>
+            <th>會員ID</th>
+            <th>會員暱稱</th>
+            <th>文章編號</th>
+            <th>文章標題</th>
+            <th>閱讀起始時間</th>
+            <th>閱讀結束時間</th>
+            <th>IP 位址</th>
+        </tr>
+    </thead>
+    <tbody id="logTableBody">
+
+    </tbody>
+
+</table>
+
+@section Scripts
+{
+    <script>
+            const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
+
+        $(function(){
+            //console.log("ready");
+            $.ajax({
+            url:`${baseAddress}api/TLogs/myLogs`,
+            menubar:'GET',
+            }).done(data=>{
+                //console.log(data);
+                allLogs = data;
+                renderLogs(allLogs);
+                
+            }).fail(err=>{
+                alert("讀取資料錯誤");
+            });
+        });
+
+        $("#searchInput").on("input",function(){
+            console.log("searchInput");
+            const keyword = $(this).val().toLowerCase();
+            const filteredLogs = allLogs.filter(log=>
+                (log.fUserName && log.fUserName.toLowerCase().includes(keyword)) ||
+                (log.fTitle && log.fTitle.toLowerCase().includes(keyword))
+                );
+            renderLogs(filteredLogs);
+        });
+
+        function renderLogs(data){
+            let tbody="";
+            data.forEach(item=>{
+                tbody+=`<tr class="text-center">
+                <td>${item.fLogId}</td>
+                <td>${item.fUserId}</td>
+                <td>${item.fUserName}</td>
+                <td>${item.fDocumentId}</td>
+                <td>${item.fTitle}</td>
+                <td>${item.fStartTime ? new Date(item.fStartTime).toLocaleString():''}</td>
+                <td>${item.fEndTime? new Date(item.fEndTime).toLocaleString():''}</td>
+                <td>${item.fClientIp}</td>
+                </tr>`;
+            });
+            $("#logTableBody").html(tbody);
+        }
+    </script>
+}
