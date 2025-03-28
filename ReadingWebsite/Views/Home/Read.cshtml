@@ -14,7 +14,7 @@
 @section Scripts{
     <script>
         const baseAddress = "https://yuantaprojectapi-dbg3e4e7dcb6aegr.eastasia-01.azurewebsites.net/";
-        let currentId =@ViewBag.fDocumentId;
+        let currentId = @Html.Raw(Json.Serialize(ViewBag.fDocumentId));
         let articleList=[];
         let readingLogId=null;
 
@@ -22,7 +22,7 @@
             getArticleList().then(function(data){                
                 //console.log(data);
                 articleList = data;
-                //console.log('currrentId:'+currentId);
+                console.log('currrentId:'+currentId);
                 loadArticle(currentId);           
             });
             window.addEventListener("beforeunload",function(){
