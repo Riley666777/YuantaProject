@@ -25,7 +25,7 @@ namespace ReadingWebsite.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost] //MVC Controller Action
         public JsonResult Login(string account, string password)
         {
             try
