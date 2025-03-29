@@ -9,6 +9,7 @@
 <div class="mt-4">
     <button id="prevBtn" class="btn btn-info">上一篇</button>
     <button id="nextBtn" class="btn btn-info">下一篇</button>
+    <a href="#" id="goToLogsBtn" class="btn btn-dark">查看閱讀紀錄</a>
 </div>
 
 @section Scripts{
@@ -64,7 +65,7 @@
             }).done(data=>{
                 //console.log(data);
                 $("#articleTitle").text(data.fTitle);
-                $("#articleContent").text(data.fContent);
+                $("#articleContent").html(data.fContent.replace(/\n/g, "<br>"));
                 document.title = data.fTitle;
                 currentId = id;
                 //console.log('updateId:'+currentId);
@@ -124,6 +125,17 @@
                 method:'PUT'
             });
         }
+
+        $("#goToLogsBtn").click(function(e){
+            e.preventDefault();
+            if(!readingLogId){
+                window.location.href = "/Home/ReadingLogs";
+                return ;
+            }
+            endReading().done(()=>{
+                window.location.href = "/Home/ReadingLogs";
+            });
+        });
         
     </script>
 }

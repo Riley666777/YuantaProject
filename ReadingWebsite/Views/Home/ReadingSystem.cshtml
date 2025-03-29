@@ -29,7 +29,7 @@
             }).done(data=>{
             //console.log(data);
             data.forEach(function(item){
-                var btn = `<button  class="btn btn-primary mb-2" onclick="location.href='/Home/Read?id=${item.fDocumentId}'">${item.fTitle}</button><br/>`;
+                var btn = `<button  class="btn btn-primary mb-2" onclick="location.href='/Home/Read?id=${item.fDocumentId}'">&#10022;\n${item.fTitle}</button><br/>`;
                 $("#articleBtn").append(btn);
             });
             }).fail(err=>{
