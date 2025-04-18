@@ -54,7 +54,7 @@
         });
 
         $("#searchInput").on("input",function(){
-            console.log("searchInput");
+            //console.log("searchInput");
             const keyword = $(this).val().toLowerCase();
             const filteredLogs = allLogs.filter(log=>
                 (log.fUserName && log.fUserName.toLowerCase().includes(keyword)) ||

@@ -22,6 +22,7 @@
             window.location.href = "/Home/Index";
         }
  
+        //抓取文章標題並產生按鈕
         $(function() {
             $.ajax({
             url:`${baseAddress}api/TArticles/GetTitles`,
@@ -37,6 +38,7 @@
             })
         });
 
+        //歡迎詞及登出鈕
         document.addEventListener("DOMContentLoaded", function () {
             const token = localStorage.getItem("jwt_token");
             const userName = localStorage.getItem("userName");

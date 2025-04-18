@@ -23,7 +23,7 @@
             getArticleList().then(function(data){                
                 //console.log(data);
                 articleList = data;
-                console.log('currrentId:'+currentId);
+                //console.log('currrentId:'+currentId);
                 loadArticle(currentId);           
             });
             window.addEventListener("beforeunload",function(){
@@ -65,7 +65,7 @@
             }).done(data=>{
                 //console.log(data);
                 $("#articleTitle").text(data.fTitle);
-                $("#articleContent").html(data.fContent.replace(/\n/g, "<br>"));
+                $("#articleContent").html(data.fContent.replace(/\n/g, "<br>")); //文章換行處理
                 document.title = data.fTitle;
                 currentId = id;
                 //console.log('updateId:'+currentId);
@@ -110,9 +110,9 @@
                 'Authorization': 'Bearer ' + localStorage.getItem('jwt_token')
                 }
                 }).done(data=>{
-                    console.log(data);
+                    //console.log(data);
                     readingLogId = data.readingLogId;
-                    console.log('readingLogId:'+readingLogId);
+                    //console.log('readingLogId:'+readingLogId);
             });
         }
 

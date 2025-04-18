@@ -34,7 +34,6 @@
             const account = $("#account").val();
             const password = $("#password").val();
 
-            const formData = $(this).serialize();
             //console.log(formData);
             $.ajax({
                 url: `${baseAddress}api/Auth/login`,
@@ -42,7 +41,7 @@
                 contentType:'application/json',
                 data: JSON.stringify({account:account, password:password})
             }).done(data=>{
-                console.log(data);
+                //console.log(data);
                 if(data.success){
                     localStorage.setItem("jwt_token", data.token);
                     localStorage.setItem("userName", data.userName);
@@ -53,7 +52,7 @@
                 }
             }).fail(err=>{
                 console.log(err);
-                $("#loginError").text("登入失敗");
+                $("#loginError").text(err.responseJSON.message);
             })
         });
 
@@ -62,12 +61,12 @@
             $("#password").val("password01");
         }
         function demo2(){
-        $("#account").val("account02");
-        $("#password").val("password02");
+            $("#account").val("account02");
+            $("#password").val("password02");
         }
         function demo3(){
-        $("#account").val("account03");
-        $("#password").val("password03");
+            $("#account").val("account03");
+            $("#password").val("password03");
         }
 
         @if (TempData["NotLoginMessage"] != null)
